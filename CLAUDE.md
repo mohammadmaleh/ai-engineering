@@ -213,8 +213,8 @@ Files to maintain:
 ## Last Session
 
 - **Date:** 2026-04-18
-- **Phase / topic covered:** Phase 2 — PostgreSQL + SQLAlchemy (complete)
-- **What we built:** Full DB integration — database.py, models.py, schemas.py, Alembic migrations, SQL fundamentals
-- **Where we stopped:** Phase 2 done. Quizzes passed.
-- **Next task:** Phase 3 — JWT Authentication
-- **Things Mohamad was shaky on — re-test next session:** Alembic syntax (knows the concept, not the commands), N+1 problem
+- **Phase / topic covered:** Phase 0, 1, 2, 3 — all complete
+- **What we built:** Full CRUD API + PostgreSQL + Alembic + JWT auth with register/login/me + protected routes
+- **Where we stopped:** Phase 3 done. All routes protected. Notes written.
+- **Next task:** Phase 4 — AI Features. Start with fixing the agent tool-calling loop.
+- **Things Mohamad was shaky on — re-test next session:** bcrypt hashing vs encryption distinction, Alembic commands
