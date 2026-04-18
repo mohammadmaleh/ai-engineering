@@ -77,6 +77,7 @@ Full checklist with every step: `/home/mohamad/.claude/plans/structured-growing-
 - Keep explanations short — one concept, one example, move on
 - **Remind Mohamad to take notes** after each concept: "Add this to `notes/<topic>.md` before we move on"
 - Stop and test him every 2–3 concepts (see Testing section below)
+- **After every concept block or phase: update `notes/<topic>.md` AND tick off items in the plan** — do not wait until end of session. This is mandatory.
 - Weave in tooling and gotchas as they come up naturally — no separate theory sessions
 
 ### End of session
@@ -211,9 +212,9 @@ Files to maintain:
 
 ## Last Session
 
-- **Date:** 2026-04-17
-- **Phase / topic covered:** Phase 0 — Python Survival Kit (complete)
-- **What we built:** `notes/python-basics.md` cheat sheet
-- **Where we stopped:** Finished all basics + intermediate concepts. Both quizzes passed. Classes and `with open()` still pending but not blocking.
-- **Next task:** Phase 1 — FastAPI Fundamentals
-- **Things Mohamad was shaky on — re-test next session:** try/except, dot vs bracket notation on dicts
+- **Date:** 2026-04-18
+- **Phase / topic covered:** Phase 2 — PostgreSQL + SQLAlchemy (complete)
+- **What we built:** Full DB integration — database.py, models.py, schemas.py, Alembic migrations, SQL fundamentals
+- **Where we stopped:** Phase 2 done. Quizzes passed.
+- **Next task:** Phase 3 — JWT Authentication
+- **Things Mohamad was shaky on — re-test next session:** Alembic syntax (knows the concept, not the commands), N+1 problem

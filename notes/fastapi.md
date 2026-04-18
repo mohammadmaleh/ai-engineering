@@ -106,3 +106,36 @@ del documents[1]                               # delete
 ```
 
 - `documents.values()` returns a dict_values object — wrap in `list()` to return as JSON
+
+## CORS
+
+Required so your frontend (Next.js on port 3000) can call the API (port 8000).
+
+```python
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+- Never use `allow_origins=["*"]` in production — allows any website to call your API
+
+## Env Vars
+
+```python
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # reads .env file in the same folder as main.py
+
+SECRET = os.getenv("SECRET")
+if not SECRET:
+    raise RuntimeError("SECRET is not set. Add it to your .env file.")
+```
+
+- Crash loudly on startup if a required env var is missing — never fail silently
+- Always add `.env` to `.gitignore`
