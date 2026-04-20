@@ -213,8 +213,8 @@ Files to maintain:
 ## Last Session
 
 - **Date:** 2026-04-20
-- **Phase / topic covered:** Phase 4 — Agent tool-calling loop
-- **What we built:** `05-agents/agent_loop.py` — working Pattern A agent loop with Groq + Tavily search, max iterations limit, fallback summary
-- **Where we stopped:** Agent loop working. Notes updated in `notes/agents.md` and `notes/python-basics.md`.
-- **Next task:** Phase 4 continued — PDF parsing, RAG as API endpoints, citations
+- **Phase / topic covered:** Phase 4 — Agent tool-calling loop + MedDocs repo setup
+- **What we built:** `05-agents/agent_loop.py` — working Pattern A agent loop with Groq + Tavily. Set up MedDocs GitHub repo with branch protection (squash only, 1 approval, block force push). Connected Linear with two-way sync. Created `meddocs/` folder inside ai-engineer (gitignored).
+- **Where we stopped:** MedDocs repo is empty (just README). Ready to start building.
+- **Next task:** Open `meddocs/` in VSCode, create first Linear ticket, set up FastAPI project structure, start Phase 4 for real.
 - **Things Mohamad was shaky on — re-test next session:** bcrypt hashing vs encryption distinction, Alembic commands, `while/else` pattern, message roles (user/assistant/system/tool)
