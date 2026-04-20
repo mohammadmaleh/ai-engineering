@@ -212,9 +212,9 @@ Files to maintain:
 
 ## Last Session
 
-- **Date:** 2026-04-18
-- **Phase / topic covered:** Phase 0, 1, 2, 3 — all complete
-- **What we built:** Full CRUD API + PostgreSQL + Alembic + JWT auth with register/login/me + protected routes
-- **Where we stopped:** Phase 3 done. All routes protected. Notes written.
-- **Next task:** Phase 4 — AI Features. Start with fixing the agent tool-calling loop.
-- **Things Mohamad was shaky on — re-test next session:** bcrypt hashing vs encryption distinction, Alembic commands
+- **Date:** 2026-04-20
+- **Phase / topic covered:** Phase 4 — Agent tool-calling loop
+- **What we built:** `05-agents/agent_loop.py` — working Pattern A agent loop with Groq + Tavily search, max iterations limit, fallback summary
+- **Where we stopped:** Agent loop working. Notes updated in `notes/agents.md` and `notes/python-basics.md`.
+- **Next task:** Phase 4 continued — PDF parsing, RAG as API endpoints, citations
+- **Things Mohamad was shaky on — re-test next session:** bcrypt hashing vs encryption distinction, Alembic commands, `while/else` pattern, message roles (user/assistant/system/tool)

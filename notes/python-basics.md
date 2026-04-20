@@ -73,12 +73,10 @@ elif age >= 13:
     print("teenager")
 else:
     print("child")
-
-
+```
 
 - Check None with `is`: `if x is None:`
 - Not None: `if x is not None:`
-```
 
 ## Try / Except
 
@@ -157,3 +155,53 @@ one thing that I will use constantly
 import os
 os.getenv("DATABASE_URL") # get env variable
 ```
+
+## List Comprehension in Practice
+
+Given a dict with nested results (like a Tavily search response):
+
+```python
+results = {
+    "results": [
+        {"content": "Berlin is cold today, 5 degrees"},
+        {"content": "Rain expected in Berlin tomorrow"},
+        {"content": "Berlin weather forecast for the week"}
+    ]
+}
+```
+
+Extract just the content strings and join into one string:
+
+```python
+"\n".join([r["content"] for r in results["results"]])
+```
+
+Result:
+
+```text
+Berlin is cold today, 5 degrees
+Rain expected in Berlin tomorrow
+Berlin weather forecast for the week
+```
+
+Same as writing a for loop + `.append()` but in one line.
+
+## While / Else
+
+Python's `while` loop has an optional `else` block — unique to Python, doesn't exist in JS.
+
+- If the loop hits a `break` → `else` is **skipped**
+- If the loop finishes normally (condition becomes false) → `else` **runs**
+
+```python
+iteration = 0
+while iteration < 5:
+    iteration += 1
+    if some_condition:
+        break       # ← else is skipped
+# else runs only if we never hit break (exhausted all 5 iterations)
+else:
+    print("hit the limit, never broke out")
+```
+
+Use case in agents: try up to 5 times to get a final answer. If the model never stops calling tools, the `else` forces a summary.
