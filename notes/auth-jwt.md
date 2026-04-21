@@ -82,3 +82,21 @@ async def list_documents(current_user: User = Depends(get_current_user), ...):
 4. `create_access_token(user.id)` — returns signed JWT
 5. Frontend stores token, sends it in `Authorization: Bearer <token>` header on every request
 6. `get_current_user` decodes token → gets user id → returns user
+
+## Why bcrypt — Know This Cold
+
+bcrypt is the library we use to hash passwords. It is a **one-way function** — you can never reverse it to get the original password back.
+
+**On register:** hash the password, store the hash. Never store the plain text.
+
+**On login:** hash the input again and compare using `verify_password`. We never decrypt — we just hash and compare.
+
+**Why bcrypt specifically, not just any hash function?**
+
+Two reasons:
+
+1. **Automatic salting** — bcrypt adds a random value (salt) to each password before hashing. This means two users with the password `"123456"` will have completely different hashes in your database. Without salt, attackers use **rainbow tables** — precomputed lists of hash → password — and can crack thousands of passwords instantly. Salt defeats that.
+
+2. **Intentionally slow** — bcrypt is designed to be computationally expensive. Brute-forcing millions of guesses becomes impractical.
+
+**Interview answer:** "We use bcrypt because it salts automatically, which defeats rainbow table attacks, and it's slow by design, which makes brute force expensive."
