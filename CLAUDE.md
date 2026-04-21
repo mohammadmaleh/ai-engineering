@@ -213,8 +213,8 @@ Files to maintain:
 ## Last Session
 
 - **Date:** 2026-04-21
-- **Phase / topic covered:** ENG-4 — Database models, schemas, Alembic migration
-- **What we built:** `app/database.py`, `app/models.py` (4 tables: User, Document, ChatSession, ChatMessage), `app/schemas.py` (RegisterRequest, LoginRequest, TokenResponse, UserResponse), Alembic migration applied, `pyproject.toml` with black + ruff, VSCode global settings for auto-format on save.
-- **Where we stopped:** ENG-4 merged to main. Ready to start ENG-5 (JWT auth).
-- **Next task:** `git checkout main && git pull && git checkout -b ENG-5-jwt-authentication`. Build auth.py, crud.py, routes/auth.py.
-- **Things Mohamad was shaky on — re-test next session:** `back_populates` — what it does and why both sides need it. `ConfigDict(from_attributes=True)` — when and why. Alembic full flow from scratch. PR descriptions — he skipped it this session, enforce next time.
+- **Phase / topic covered:** ENG-5 — JWT Authentication
+- **What we built:** `app/auth.py` (hash_password, verify_password, create_access_token, decode_access_token, get_current_user), `app/crud.py` (get_user_by_email, get_user_by_id, create_user), `app/routes/auth.py` (POST /auth/register, POST /auth/login), `main.py` wired up. Full auth flow tested in /docs — register, login, and protected /me route all working. Also added `lint` zsh alias and PostToolUse hook for auto black+ruff on Python files.
+- **Where we stopped:** ENG-5 branch pushed. PR not opened yet — Mohamad said he'll do it later. Ready to start ENG-6.
+- **Next task:** Open PR for ENG-5 with proper description first. Then `git checkout main && git pull && git checkout -b ENG-6-...`
+- **Things Mohamad was shaky on — re-test next session:** JWT three parts (header/payload/signature) — kept mixing up. Why `verify_password` does NOT call `hash_password` first. PR descriptions — skipped again, enforce next session no exceptions. SQLAlchemy `Mapped` vs legacy `Column` — knows the fix but not fully internalized.
