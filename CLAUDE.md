@@ -42,10 +42,10 @@ Learning phases (check these off as completed):
 - [x] LLM basics — streaming, history, system prompts (`01-llm-basics/chat.py`)
 - [x] RAG — ChromaDB, chunking, context injection (`02-rag/rag.py`)
 - [x] Agents — tool schema defined, but tool-calling loop NOT implemented (`03-agents/agent.py`) ⚠️
-- [ ] Phase 0 — Python survival kit
-- [ ] Phase 1 — FastAPI fundamentals
-- [ ] Phase 2 — PostgreSQL + SQLAlchemy
-- [ ] Phase 3 — JWT authentication
+- [x] Phase 0 — Python survival kit
+- [x] Phase 1 — FastAPI fundamentals
+- [x] Phase 2 — PostgreSQL + SQLAlchemy
+- [x] Phase 3 — JWT authentication (ENG-4 + ENG-5 merged)
 - [ ] Phase 4 — AI features: agent loop, RAG as API, PDF parsing, citations, evals
 - [ ] Phase 5 — Testing with pytest
 - [ ] Phase 6 — Docker
@@ -215,6 +215,6 @@ Files to maintain:
 - **Date:** 2026-04-21
 - **Phase / topic covered:** ENG-5 — JWT Authentication
 - **What we built:** `app/auth.py` (hash_password, verify_password, create_access_token, decode_access_token, get_current_user), `app/crud.py` (get_user_by_email, get_user_by_id, create_user), `app/routes/auth.py` (POST /auth/register, POST /auth/login), `main.py` wired up. Full auth flow tested in /docs — register, login, and protected /me route all working. Also added `lint` zsh alias and PostToolUse hook for auto black+ruff on Python files.
-- **Where we stopped:** ENG-5 branch pushed. PR not opened yet — Mohamad said he'll do it later. Ready to start ENG-6.
-- **Next task:** Open PR for ENG-5 with proper description first. Then `git checkout main && git pull && git checkout -b ENG-6-...`
-- **Things Mohamad was shaky on — re-test next session:** JWT three parts (header/payload/signature) — kept mixing up. Why `verify_password` does NOT call `hash_password` first. PR descriptions — skipped again, enforce next session no exceptions. SQLAlchemy `Mapped` vs legacy `Column` — knows the fix but not fully internalized.
+- **Where we stopped:** ENG-5 merged to main. Ready to start ENG-6.
+- **Next task:** `git checkout main && git pull && git checkout -b ENG-6-document-upload`
+- **Things Mohamad was shaky on — re-test next session:** JWT three parts (header/payload/signature) — kept mixing up. Why `verify_password` does NOT call `hash_password` first. PR descriptions — skipped TWICE, no exceptions next session. SQLAlchemy `Mapped` vs legacy `Column` — knows the fix but not fully internalized.
