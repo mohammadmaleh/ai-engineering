@@ -212,9 +212,9 @@ Files to maintain:
 
 ## Last Session
 
-- **Date:** 2026-04-20
-- **Phase / topic covered:** Phase 4 — Agent tool-calling loop + MedDocs repo setup
-- **What we built:** `05-agents/agent_loop.py` — working Pattern A agent loop with Groq + Tavily. Set up MedDocs GitHub repo with branch protection (squash only, 1 approval, block force push). Connected Linear with two-way sync. Created `meddocs/` folder inside ai-engineer (gitignored).
-- **Where we stopped:** MedDocs repo is empty (just README). Ready to start building.
-- **Next task:** Open `meddocs/` in VSCode, create first Linear ticket, set up FastAPI project structure, start Phase 4 for real.
-- **Things Mohamad was shaky on — re-test next session:** bcrypt hashing vs encryption distinction, Alembic commands, `while/else` pattern, message roles (user/assistant/system/tool)
+- **Date:** 2026-04-21
+- **Phase / topic covered:** ENG-4 — Database models, schemas, Alembic migration
+- **What we built:** `app/database.py`, `app/models.py` (4 tables: User, Document, ChatSession, ChatMessage), `app/schemas.py` (RegisterRequest, LoginRequest, TokenResponse, UserResponse), Alembic migration applied, `pyproject.toml` with black + ruff, VSCode global settings for auto-format on save.
+- **Where we stopped:** ENG-4 merged to main. Ready to start ENG-5 (JWT auth).
+- **Next task:** `git checkout main && git pull && git checkout -b ENG-5-jwt-authentication`. Build auth.py, crud.py, routes/auth.py.
+- **Things Mohamad was shaky on — re-test next session:** `back_populates` — what it does and why both sides need it. `ConfigDict(from_attributes=True)` — when and why. Alembic full flow from scratch. PR descriptions — he skipped it this session, enforce next time.
