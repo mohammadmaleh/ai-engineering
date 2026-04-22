@@ -139,3 +139,33 @@ if not SECRET:
 
 - Crash loudly on startup if a required env var is missing — never fail silently
 - Always add `.env` to `.gitignore`
+
+### config.py pattern
+
+Instead of importing `os` and `load_dotenv` in every file, centralize all env vars in one `config.py`:
+
+```python
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+def _require(name: str) -> str:
+    value = os.getenv(name)
+    if not value:
+        raise RuntimeError(f"{name} is not set")
+    return value
+
+DATABASE_URL = _require("DATABASE_URL")
+OPENAI_API_KEY = _require("OPENAI_API_KEY")
+```
+
+Then in any other file:
+```python
+from app.config import OPENAI_API_KEY
+```
+
+- One place to manage all keys
+- App crashes at startup if any key is missing — not when a user hits the endpoint
+
+

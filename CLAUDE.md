@@ -46,7 +46,7 @@ Learning phases (check these off as completed):
 - [x] Phase 1 — FastAPI fundamentals
 - [x] Phase 2 — PostgreSQL + SQLAlchemy
 - [x] Phase 3 — JWT authentication (ENG-4 + ENG-5 merged)
-- [ ] Phase 4 — AI features: agent loop, RAG as API, PDF parsing, citations, evals
+- [ ] Phase 4 — AI features: agent loop, RAG as API, PDF parsing ✅, citations, evals
 - [ ] Phase 5 — Testing with pytest
 - [ ] Phase 6 — Docker
 - [ ] Phase 7 — Deploy + CI/CD
@@ -222,9 +222,9 @@ Files to maintain:
 
 ## Last Session
 
-- **Date:** 2026-04-21
-- **Phase / topic covered:** ENG-5 — JWT Authentication
-- **What we built:** `app/auth.py` (hash_password, verify_password, create_access_token, decode_access_token, get_current_user), `app/crud.py` (get_user_by_email, get_user_by_id, create_user), `app/routes/auth.py` (POST /auth/register, POST /auth/login), `main.py` wired up. Full auth flow tested in /docs — register, login, and protected /me route all working. Also added `lint` zsh alias and PostToolUse hook for auto black+ruff on Python files.
-- **Where we stopped:** ENG-5 merged to main. Ready to start ENG-6.
-- **Next task:** `git checkout main && git pull && git checkout -b ENG-6-document-upload`
-- **Things Mohamad was shaky on — re-test next session:** JWT three parts (header/payload/signature) — kept mixing up. Why `verify_password` does NOT call `hash_password` first. PR descriptions — skipped TWICE, no exceptions next session. SQLAlchemy `Mapped` vs legacy `Column` — knows the fix but not fully internalized.
+- **Date:** 2026-04-22
+- **Phase / topic covered:** ENG-6 — Document Upload
+- **What we built:** `app/config.py` (centralized env var loading with crash-on-missing pattern), `app/services/document_processor.py` (PDF text extraction with PyMuPDF, chunking with overlap, OpenAI embeddings, Pinecone upsert), `app/routes/documents.py` (POST /documents/upload, GET /documents, GET /documents/{id}), `app/models.py` upgraded all models to SQLAlchemy 2.0 `Mapped` style. Full pipeline tested — PDF uploaded, vectors visible in Pinecone dashboard.
+- **Where we stopped:** ENG-6 merged to main. Ready to start ENG-7.
+- **Next task:** `git checkout main && git pull && git checkout -b ENG-7-chat-endpoint`
+- **Things Mohamad was shaky on — re-test next session:** Why chunk text is stored in Pinecone metadata (not just the vector). The difference between `==` and `=` in SQLAlchemy filter. PR descriptions — wrote it this time but only after being pushed hard. `Mapped` style — understands it now but needed multiple reminders.
