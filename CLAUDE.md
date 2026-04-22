@@ -31,7 +31,7 @@ Upload medical documents (Arztbriefe, lab reports, discharge summaries). The app
 
 Why this is impressive: specific real market, citation highlighting is non-trivial, DSGVO awareness, directly relevant to Germany's healthcare digitalization push.
 
-Stack: FastAPI · PostgreSQL · SQLAlchemy · JWT · ChromaDB · OpenAI API · PyMuPDF (PDF parsing) · Next.js · Tailwind · Docker · GitHub Actions · Langfuse
+Stack: FastAPI · PostgreSQL · SQLAlchemy · JWT · Pinecone · OpenAI API · PyMuPDF (PDF parsing) · Next.js · Tailwind · Docker · GitHub Actions · Langfuse
 
 > For a portfolio project, use fake/sample medical documents only. Never real patient data. Mention DSGVO compliance as a production concern in the README.
 
@@ -40,7 +40,7 @@ Stack: FastAPI · PostgreSQL · SQLAlchemy · JWT · ChromaDB · OpenAI API · P
 Learning phases (check these off as completed):
 
 - [x] LLM basics — streaming, history, system prompts (`01-llm-basics/chat.py`)
-- [x] RAG — ChromaDB, chunking, context injection (`02-rag/rag.py`)
+- [x] RAG — ChromaDB (learning exercise only), chunking, context injection (`02-rag/rag.py`)
 - [x] Agents — tool schema defined, but tool-calling loop NOT implemented (`03-agents/agent.py`) ⚠️
 - [x] Phase 0 — Python survival kit
 - [x] Phase 1 — FastAPI fundamentals
@@ -60,7 +60,7 @@ Full checklist with every step: `/home/mohamad/.claude/plans/structured-growing-
 - venv, pip, dotenv, installing packages
 - LLMs have no memory — full message history must be sent every call
 - Streaming: `stream=True`, iterate chunks, `chunk.choices[0].delta.content`
-- RAG: chunk → embed → store in ChromaDB → query by similarity → inject into prompt
+- RAG: chunk → embed → store in Pinecone → query by similarity → inject into prompt
 - Vector = array of numbers representing the meaning of text
 - Tool calling: define JSON schema, pass to model, model decides when to call it
 - Two agent patterns: (a) model decides to call tools, (b) always search then summarize
