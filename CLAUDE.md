@@ -153,10 +153,20 @@ Files to maintain:
 - Every endpoint gets a docstring (FastAPI shows it in `/docs`)
 - `requirements.txt` must be up to date before every commit
 
+## OpenAI API — Cost Rules ($5 budget, make it last)
+
+- **Embeddings:** `text-embedding-3-small` only — cheapest, still industry standard. Never use `text-embedding-3-large` or `ada-002`.
+- **Chat/LLM:** Use **Groq** (free) for all development and testing. Only switch to OpenAI `gpt-4o-mini` if Groq is unavailable. Never use `gpt-4o` or `gpt-4-turbo` — they will drain the budget fast.
+- **During development:** Always test with short sample documents (1–2 pages). Never upload large PDFs while iterating.
+- **Embeddings are cheap** — the $5 risk is chat completions. Keep chat on Groq.
+- **No streaming tests in loops** — test streaming manually, not in scripts that call the API repeatedly.
+- **Before every OpenAI API call added to code:** ask "can this be Groq instead?" If yes, use Groq.
+
 ## Key Decisions
 
-- **Groq during learning** (free, fast) → **switch to OpenAI before deployment** (2-line change)
-- OpenAI because: industry standard, employers recognize it, Groq is not used in production
+- **Groq for chat** (free, fast) — use throughout the entire project including production demo
+- **OpenAI `text-embedding-3-small` for embeddings only** — no free alternative worth using
+- OpenAI embeddings because: industry standard, employers recognize it
 - FastAPI for backend — most used Python web framework in AI/ML companies
 - Next.js for frontend — biggest edge over Python-only AI candidates
 - No LangChain — learning fundamentals first, better for interviews
