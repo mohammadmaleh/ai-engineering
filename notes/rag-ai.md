@@ -80,3 +80,111 @@ User uploads PDF
 Two databases working together:
 - **PostgreSQL** — document metadata, full text, user ownership
 - **Pinecone** — vectors + chunk text for semantic search (used in chat/RAG)
+
+---
+
+## RAG Chat Pipeline (ENG-7)
+
+When a user sends a message, this is what happens in order:
+
+```
+1. Embed the question → vector
+2. Query Pinecone (filter by user_id) → top 5 relevant chunks
+3. Build prompt: system message with chunks + user message
+4. Call Groq with stream=True → yield tokens one by one
+5. Save user message to DB
+6. Save full assistant reply to DB after stream ends
+```
+
+### Why always search Pinecone (not let the model decide)
+
+This is NOT an agent. We always search, every time. The model doesn't decide when to look things up — we always inject context. Simpler, more reliable, easier to test.
+
+### Why filter by user_id not doc_id
+
+Sessions are not tied to a single document. A user can ask about anything across all their uploaded documents. Pinecone filters by `user_id` so we only search that user's vectors.
+
+### Embedding the question
+
+You can't query Pinecone with raw text. Pinecone only understands vectors. So you must embed the question first:
+
+```python
+response = openai_client.embeddings.create(model="text-embedding-3-small", input=[content])
+embedding = response.data[0].embedding  # list of 1536 floats
+```
+
+### Querying Pinecone
+
+```python
+results = pinecone_index.query(
+    vector=embedding,
+    top_k=5,
+    include_metadata=True,
+    filter={"user_id": user_id},
+)
+chunks = [match["metadata"]["text"] for match in results["matches"]]
+```
+
+`top_k=5` means return the 5 most similar chunks. The text is in `metadata["text"]` — you stored it there during upload.
+
+### Building the prompt
+
+```python
+context = "\n\n".join(chunks)
+messages = [
+    {
+        "role": "system",
+        "content": (
+            "You are a medical document assistant. "
+            "Answer only from the document excerpts below. "
+            "If the answer is not in the excerpts, say so.\n\n"
+            f"Document excerpts:\n{context}"
+        ),
+    },
+    {"role": "user", "content": content},
+]
+```
+
+### SSE Streaming with yield
+
+`yield` makes a function a **generator** — it produces values one at a time instead of returning everything at once. FastAPI's `StreamingResponse` needs a generator.
+
+```python
+async def handle_message(...):
+    stream = groq_client.chat.completions.create(model=..., messages=..., stream=True)
+    for chunk in stream:
+        delta = chunk.choices[0].delta.content
+        if delta:
+            yield delta  # sends each token to the client as it arrives
+```
+
+If you used `return` instead of `yield`, you'd have to wait for the full response before sending anything. `yield` sends each token immediately.
+
+### SSE vs WebSockets
+
+- **SSE** — one direction only: server → client. Used for streaming LLM responses. Simpler.
+- **WebSockets** — two-way real-time. Used for chat apps, live cursors, multiplayer. More complex.
+
+For LLM streaming, always use SSE.
+
+### Auto-creating a session
+
+If `session_id` is `None`, create a session before saving the message:
+
+```python
+if session_id is None:
+    session = ChatSession(user_id=user_id)
+    db.add(session)
+    db.commit()
+    db.refresh(session)
+    session_id = session.id
+```
+
+This means the user never explicitly creates a session — it happens automatically on the first message.
+
+### Query param vs request body
+
+- **Request body** — data sent inside the POST request (e.g. `content`). Defined in the Pydantic schema.
+- **Query parameter** — appended to the URL (e.g. `/chat/messages?session_id=3`). Defined as a function parameter with a default.
+
+`session_id` is a query param because it's optional and modifies the behaviour of the request — it's not part of the message data itself.
