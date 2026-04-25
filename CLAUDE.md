@@ -222,9 +222,9 @@ Files to maintain:
 
 ## Last Session
 
-- **Date:** 2026-04-23
-- **Phase / topic covered:** ENG-7 — Chat Endpoint
-- **What we built:** `app/services/chat_service.py` (RAG pipeline — embed question, query Pinecone filtered by user_id, build prompt with retrieved chunks, stream Groq response via SSE using `yield`, save user + assistant messages to DB), `app/routes/chat.py` (POST /chat/messages with SSE StreamingResponse + auto-session creation, GET /chat/sessions, GET /chat/sessions/{id}/messages with ownership check), updated `document_processor.py` to store `user_id` in Pinecone metadata, removed `document_id` from `ChatSession` model + Alembic migration. Full pipeline tested end to end — RAG response streamed, sessions and messages persisted.
-- **Where we stopped:** ENG-7 merged to main. Ready to start ENG-8.
-- **Next task:** `git checkout main && git pull && git checkout -b ENG-8-citation-highlighting`
-- **Things Mohamad was shaky on — re-test next session:** Why `yield` makes a function a generator (and why StreamingResponse needs a generator). Why we always search Pinecone instead of letting the model decide. The difference between a query parameter and a request body field. SSE vs WebSockets — when to use each. Why we filter Pinecone by `user_id` not `doc_id`.
+- **Date:** 2026-04-25
+- **Phase / topic covered:** ENG-8 — Citation Highlighting
+- **What we built:** Added citation sources to the chat pipeline. `chat_service.py` now yields a final SSE event `{"type": "sources", "sources": [...]}` after streaming completes. Each source has `text` + `page_number`. Added `sources` JSON column to `ChatMessage` model with Alembic migration. Fixed `context` bug (chunks were dicts, not strings — needed `chunk["text"]`). Used `.get("page_number")` to handle old Pinecone vectors missing that field. Resolved merge conflicts with main (main had a `/me` endpoint and schema changes). PR merged.
+- **Where we stopped:** ENG-8 merged. Ready to start ENG-9.
+- **Next task:** `git checkout main && git pull && git checkout -b ENG-9-keyword-flagging`
+- **Things Mohamad was shaky on — re-test next session:** `json.dumps()` returns a string not a dict. Why the sources `yield` comes after the stream loop not inside it. `KeyError` vs `.get()` — when each crashes and when it doesn't. Why `sources` column is `nullable=True` not `default=list`.

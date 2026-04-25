@@ -182,6 +182,60 @@ if session_id is None:
 
 This means the user never explicitly creates a session — it happens automatically on the first message.
 
+---
+
+## Citation Highlighting (ENG-8)
+
+After the model finishes streaming, we send one final SSE event containing the source chunks used to generate the answer.
+
+### Why citations matter
+- Users need to know *where* the information came from — especially in a medical context
+- Reduces hallucination risk: user can verify the answer against the source
+- Required for trust in any healthcare app
+
+### The final sources event
+
+```python
+sources_event = json.dumps({"type": "sources", "sources": chunks})
+yield f"data: {sources_event}\n\n"
+```
+
+This comes **after** the stream loop — the full answer is sent first, then sources as a separate event.
+
+### chunks structure
+
+Each chunk is a dict with text + page number:
+```python
+chunks = [
+    {
+        "text": match["metadata"]["text"],
+        "page_number": match["metadata"].get("page_number"),
+    }
+    for match in search_results["matches"]
+]
+```
+
+`.get("page_number")` instead of `["page_number"]` — returns `None` if the key is missing instead of crashing with a `KeyError`.
+
+### Storing sources in the DB
+
+```python
+assistant_message = ChatMessage(
+    role="assistant", content=full_reply, session_id=session_id, sources=chunks
+)
+```
+
+`sources` is a JSON column on `ChatMessage` (nullable). User messages have `sources=None`. Only assistant messages have sources.
+
+### json.dumps() vs json.loads()
+
+- `json.dumps(obj)` — Python dict/list → JSON string (dump **to** string)
+- `json.loads(s)` — JSON string → Python dict/list (load **from** string)
+
+SSE sends plain text, so you must serialize with `dumps` before yielding.
+
+---
+
 ### Query param vs request body
 
 - **Request body** — data sent inside the POST request (e.g. `content`). Defined in the Pydantic schema.
