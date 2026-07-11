@@ -21,17 +21,18 @@
 
 ## The Flagship Project
 
-**MedDocs** — Medical Document Analyzer for the German healthcare market.
+**MedDocs** — Multi-tenant Clinical Document Workflow Platform for the German healthcare market (pivoted 2026-07-11 from single-user "document analyzer" to a full platform — see `PLAN.md` §1–2 for the complete vision).
 
-Upload medical documents (Arztbriefe, lab reports, discharge summaries). The app:
-- Summarizes them in plain language
-- Answers questions with exact citations from the document
-- Flags critical keywords (dringend, kritisch, abnormal values)
-- Stores document + chat history per user account
+A clinic/hospital department receives medical documents (Überweisungen, Laborbefunde, Arztbriefe, Entlassungsbriefe). The platform:
+- Ingests them into an org-scoped AI pipeline: classify type + urgency (LLM structured output), plain-language summary, critical-keyword and lab-value flagging, per-page embeddings
+- Routes them through a **review workflow** (state machine: received → triaged → assigned → in review → approved/rejected → archived) with work queues, second-opinion path, SLA escalation
+- **Roles & permissions** (org_admin, physician, assistant, auditor — RBAC), invitations, multi-tenancy with proven org isolation
+- Document workspace: PDF viewer with **citation-grounded Q&A** (click citation → exact page highlight), annotations, structured lab-value trends
+- **Feature flags** per tenant (incl. percentage rollout of new AI prompt versions), append-only **audit log** (DSGVO story), real-time notifications (WebSocket), department analytics dashboard
 
-Why this is impressive: specific real market, citation highlighting is non-trivial, DSGVO awareness, directly relevant to Germany's healthcare digitalization push.
+Why this is impressive: senior engineering concerns done for real — tenancy, RBAC, workflow state machines with row-locking, async AI pipelines with retries and evals, audit trails, flags — in a specific real market.
 
-Stack: FastAPI · PostgreSQL · SQLAlchemy · JWT · Pinecone · OpenAI API · PyMuPDF (PDF parsing) · Next.js · Tailwind · Docker · GitHub Actions · Langfuse
+Stack: FastAPI · PostgreSQL · SQLAlchemy · JWT · Pinecone · OpenAI API · Groq · PyMuPDF · Object storage (R2/MinIO) · WebSockets · Next.js · Tailwind · Docker · Redis (M6+) · GitHub Actions · Langfuse · Sentry
 
 > For a portfolio project, use fake/sample medical documents only. Never real patient data. Mention DSGVO compliance as a production concern in the README.
 
@@ -46,14 +47,17 @@ Learning phases (check these off as completed):
 - [x] Phase 1 — FastAPI fundamentals
 - [x] Phase 2 — PostgreSQL + SQLAlchemy
 - [x] Phase 3 — JWT authentication (ENG-4 + ENG-5 merged)
-- [ ] Phase 4 — AI features: agent loop, RAG as API, PDF parsing ✅, citations, evals
-- [ ] Phase 5 — Testing with pytest
-- [ ] Phase 6 — Docker
-- [ ] Phase 7 — Deploy + CI/CD
-- [ ] Phase 8 — Observability with Langfuse
-- [ ] Phase 9 — READMEs, CV, start applying
+- [x] Backend core — upload→embed→Pinecone, RAG chat + SSE, citations, keyword flagging (ENG-6→ENG-9 merged)
+- [ ] **M0 — Re-entry** (backend runs again, rust-check, commit April doc changes) — 2–3 days
+- [ ] **M1 — System design package** (architecture doc, ERD, permission matrix, workflow state machine, ADRs, API conventions in `meddocs/docs/`) — 1 week
+- [ ] **M2 — Foundation** (v1 defect fixes incl. real citation page numbers; multi-tenancy + RBAC; refresh tokens + invitations; object storage for PDFs; API v1 conventions; fixtures + seeder; walking skeleton deployed) — 3 weeks
+- [ ] **M3 — Workflow engine** (guarded state machine, work queues with `FOR UPDATE SKIP LOCKED`, comments, audit log, SLA escalation, WebSocket notifications, second opinion) — 3–4 weeks
+- [ ] **M4 — AI pipeline v2** (background jobs with retries, LLM classification + urgency, lab-value extraction, scoped RAG with real citations, Langfuse, evals, feature-flag service) — 3 weeks
+- [ ] **M5 — Frontend platform** (design system, inbox/queues, document workspace with PDF+citations+chat, admin area, flags UI, analytics dashboard, lab trends, i18n de/en, FTS) — 5–6 weeks
+- [ ] **M6 — Production hardening** (worker + Redis queue, full compose stack, CI matrix, test pyramid + Playwright, security pass, Sentry, staging, DSGVO features) — 3 weeks
+- [ ] **M7 — Ship** (README, architecture case study, CV) — 1 week
 
-Full checklist with every step: `/home/mohamad/.claude/plans/structured-growing-rain.md`
+Full roadmap with the system design, defect audit, and working agreement: **`PLAN.md` in this repo** (v2, 2026-07-11 — replaces the deleted `structured-growing-rain.md`; plans now live in the repo so they can't vanish).
 
 ## Concepts Already Understood
 
@@ -214,7 +218,9 @@ Files to maintain:
 - LangChain / LlamaIndex — hides fundamentals, hurts AI interviews
 - Fine-tuning — needs GPU budget, low ROI for job hunting
 - Deep Python OOP — not needed at this stage
-- Redis, message queues, microservices — premature
+- Redis + worker queue — **deferred, not skipped**: justified by the platform scope, but only in M6 when the jobs demand it (ADR required). Adopting infra before the need is a junior tell.
+- Microservices — deliberate monolith (PLAN.md ADR-001); be able to argue why NOT
+- ML model training / prediction — that's data science; urgency triage stays rule+LLM based and honestly named
 - GraphQL — REST is fine, don't split focus
 - Kubernetes — not expected at mid-level
 
@@ -222,9 +228,9 @@ Files to maintain:
 
 ## Last Session
 
-- **Date:** 2026-04-25
-- **Phase / topic covered:** ENG-8 — Citation Highlighting
-- **What we built:** Added citation sources to the chat pipeline. `chat_service.py` now yields a final SSE event `{"type": "sources", "sources": [...]}` after streaming completes. Each source has `text` + `page_number`. Added `sources` JSON column to `ChatMessage` model with Alembic migration. Fixed `context` bug (chunks were dicts, not strings — needed `chunk["text"]`). Used `.get("page_number")` to handle old Pinecone vectors missing that field. Resolved merge conflicts with main (main had a `/me` endpoint and schema changes). PR merged.
-- **Where we stopped:** ENG-8 merged. Ready to start ENG-9.
-- **Next task:** `git checkout main && git pull && git checkout -b ENG-9-keyword-flagging`
-- **Things Mohamad was shaky on — re-test next session:** `json.dumps()` returns a string not a dict. Why the sources `yield` comes after the stream loop not inside it. `KeyError` vs `.get()` — when each crashes and when it doesn't. Why `sources` column is `nullable=True` not `default=list`.
+- **Date:** 2026-07-11
+- **Phase / topic covered:** Re-planning after a ~2.5-month break. (Mohamad also has a second portfolio piece from that period: FleetPulse, a React/TypeScript fleet-ops dashboard — ECharts, OpenLayers, design tokens, PRODUCT.md.)
+- **What we did:** Full audit of MedDocs + rewrote the roadmap as `PLAN.md` (repo root). Found 8 backend defects to fix before frontend work — the big one: **citation page numbers in Pinecone are computed arithmetically, not from real pages (D1)**. Also: no chat history sent to LLM (D2), broken SSE framing (D3), no CORS (D4), no doc-scoped chat (D5), blocking upload (D6), summary feature missing entirely (D7). New milestone structure M0–M4, deploy-early (Render + Neon + Vercel), applications start at M2 (~Aug 15).
+- **Where we stopped:** Plan written. Nothing coded yet. `ai-engineer` repo still has uncommitted April doc changes.
+- **Next task:** **M0 re-entry session** — get the backend running locally again (venv, `.env`, `alembic upgrade head`, smoke-test `/docs`), rust-check on the whole backend, commit pending doc changes. Then ENG-10 (real citation page numbers).
+- **Things Mohamad was shaky on — re-test next session (carried over from April):** Why keyword flagging runs at upload time not chat time. `enumerate()` order — index first, item second. `+=` on lists vs `append`. Why `# type: ignore` is sometimes necessary with third-party libraries missing type stubs. Plus after the break: full RAG pipeline out loud, JWT flow end-to-end.

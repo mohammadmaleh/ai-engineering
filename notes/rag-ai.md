@@ -236,6 +236,70 @@ SSE sends plain text, so you must serialize with `dumps` before yielding.
 
 ---
 
+---
+
+## Keyword Flagging (ENG-9)
+
+Scanning documents for critical medical terms at upload time — deterministic, free, no AI calls.
+
+### Why not use the LLM for this
+
+- Costs money on every chat call
+- LLMs can hallucinate — might miss a keyword or invent one
+- String matching is deterministic: same input, always same output
+
+### Why at upload time not chat time
+
+Document text doesn't change. Scan once, store result, read it many times.
+
+### keyword_service.py
+
+```python
+def check_keyword(text: str, page_number: int) -> list[dict]:
+    keywords = ["kritisch", "dringend", "abnormal", "notfall", "sofort"]
+    return [{"keyword": kw, "page_number": page_number} for kw in keywords if kw in text.lower()]
+```
+
+- Takes text + page number, returns list of matched keywords with their page
+- Case insensitive: `kw in text.lower()` — lowercasing both sides catches `Kritisch`, `KRITISCH`, etc.
+- List comprehension: filter + transform in one line
+
+### Refactoring extract_text_from_pdf
+
+Changed return type from `str` to `list[dict]` so we have per-page text:
+
+```python
+def extract_text_from_pdf(file_bytes: bytes) -> list[dict]:
+    doc = fitz.open(stream=file_bytes, filetype="pdf")
+    pages = [{"text": page.get_text("text"), "page_number": index + 1} for index, page in enumerate(doc)]  # type: ignore
+    doc.close()
+    return pages
+```
+
+`enumerate(doc)` gives `(index, page)` — always `index` first, `page` second.
+
+In `documents.py`, reconstruct the full string for chunking:
+```python
+pages = extract_text_from_pdf(file_bytes=file_bytes)
+text = " ".join([page["text"] for page in pages])
+```
+
+### Collecting flags across all pages
+
+```python
+all_flags = []
+for item in pages:
+    all_flags += check_keyword(text=item["text"], page_number=item["page_number"])
+```
+
+`+=` on lists concatenates them — same as `.extend()`. Each page returns a list, we join them all into one flat list.
+
+### Storage
+
+`flags` is a `JSON` column on `Document`, `nullable=True`. Stored at upload time, returned in `DocumentResponse`.
+
+---
+
 ### Query param vs request body
 
 - **Request body** — data sent inside the POST request (e.g. `content`). Defined in the Pydantic schema.
