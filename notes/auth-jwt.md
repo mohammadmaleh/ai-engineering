@@ -12,6 +12,20 @@
 - **Password hashing** — one-way. You can never get the original password back. Use bcrypt.
 - **`verify_password`** — re-hashes the input and compares to the stored hash. Never decrypt.
 
+## Stateless — the #1 thing people get wrong (incl. me, 2026-07)
+
+The server stores **nothing** about the token. It does NOT save issued tokens and does NOT compare the incoming token against the DB. That's the whole difference from old session auth.
+
+On each request `jwt.decode(token, SECRET_KEY, ...)` **recomputes the signature** and checks it matches:
+- matches → token is authentic → read `sub` (user id) straight from the payload
+- tampered payload / wrong secret / expired → `JWTError` → 401
+
+**Why you can't forge one:** to make a valid token claiming to be user 42 you'd need to produce a correct *signature*, which requires `SECRET_KEY`. Only the server has it. Change one character of the payload and the signature breaks. That's the entire security model — cryptography, not a DB check.
+
+The DB call in `get_current_user` (`get_user_by_id`) just **loads the user object** named by the token — that's fetching the record, not verifying the token.
+
+**Stateless (JWT) vs stateful (session):** session = server stores a session id, looks it up every request. JWT = server stores nothing, verifies by signature. Trade-off: a JWT can't be easily revoked before it expires → that's why tokens are short-lived + refresh tokens exist (M2).
+
 ## Packages
 
 ```bash

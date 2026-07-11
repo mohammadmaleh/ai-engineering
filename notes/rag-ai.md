@@ -45,6 +45,23 @@ response = openai_client.embeddings.create(
 )
 ```
 
+## How matching works — cosine similarity
+
+An array of numbers is also an **arrow** in space. `[3, 4]` = go 3 across, 4 up → an arrow to that point. An embedding is an arrow in ~1536 dimensions — can't picture it, but the math is the same.
+
+Pinecone matches by **cosine similarity** = the **angle between two arrows**:
+- small angle → same direction → similar meaning → score near **1**
+- 90° → unrelated → score near **0**
+- opposite → near **-1**
+
+It's the *direction* that carries meaning, not the length — that's why cosine (angle), not raw distance.
+
+**Meaning, not words.** The model is trained so similar *meaning* → arrows pointing the same way, even with totally different words:
+- *"Hämoglobin 8.1, niedrig"* and *"patient is anemic, low red cells"* share almost no words but point nearly the same direction.
+- Same word, different meaning (*"bank"* river vs money) → different directions.
+
+**Interview:** this is exactly why vector search beats Postgres full-text / keyword search — it retrieves by *meaning* (finds *"Anämie"* when you asked about *"low hemoglobin"*), not by string match.
+
 ## Pinecone
 
 A managed vector database. Stores vectors and lets you search by meaning (semantic search), not by exact text match.
