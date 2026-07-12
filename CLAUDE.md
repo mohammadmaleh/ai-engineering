@@ -279,5 +279,15 @@ Files to maintain:
 - **He asked if the notes are legit.** Told him straight: they're accurate, but **"I'll reread them later" does not work** — rereading is the illusion of fluency. Proof: the JWT mechanism was *already* in `notes/auth-jwt.md` and he still failed it 3×. **Notes = lookup reference. Testing = the actual learning.** Keep testing him cold.
 - **Process habits — improving:** squash-merge titles are now consistently clean (#26, #27, #28 ✅). He merged only completed work this time (no WIP merge). Board drift is still the weak one — **check Linear against git at every session start.**
 
+### Job hunt (2026-07-12) — the clock is now running
+
+- **He applied to 10–15 companies** (fullstack + frontend) after being pushed on it. **This matters more than any ticket.** Keep it a *rate*, not a one-off: ask every session how many went out this week.
+- **Fullstack CV + cover letters rebuilt** and live in **`~/cv-fullstack/`** (HTML sources + `build.sh` → 4 PDFs, EN + DE). Edit the `.html`, run `bash build.sh`, never edit the PDFs.
+  - Killed the **Java/Spring Boot** line (he never learned Java — it was months stale and would have died in an interview). Now Python/FastAPI/PostgreSQL.
+  - Added a **Projects** section: MedDocs, honestly scoped as *"side project, in progress"*, no dates.
+  - ⚠️ **He asked me to write that MedDocs was FINISHED. I refused** and he accepted the honest version. If he raises it again: "finished" and "in progress" get the *same* interview, and a tech reviewer opening the repo would catch it instantly. Do not help him fabricate.
+  - He **twice stripped "senior" off his own CV**. Same pattern as undervaluing design work. He is a senior; **he is aiming a level too low.** Keep pushing him to apply senior/fullstack, not mid-level.
+- **A tech screen could land in ~2–3 weeks.** So sessions now have a **second job**: interview readiness. Ask questions the way an interviewer does — *"walk me through what happens when…"*, not *"what is X"* — because his weakness is exactly the follow-up.
+
 - **Next task: ENG-14 — `workflow.md` (document state machine).** `permissions.md` explicitly foreshadows it and he's already primed: he invented the **guard/precondition** idea himself. Going in: **states** (`received → triaged → assigned → in_review → approved|rejected → archived` + second-opinion path), a **transition table** (which permission triggers it + the **guard**), and the rule that **every transition writes a `document_events` row**. Concretely: `document:delete` is only legal while `status='received' AND assignee IS NULL AND no comments` — that's a guard, not a permission. Then ENG-15 api-conventions, ENG-16 ADRs (001 monolith, 002 tenancy, 003 authz, 004 flags, 005 storage), ENG-17 wireframes. He leads each doc; I attack, he defends.
 - **Older carryover:** he **reaches for vendor names too early** (S3, Gmail) — "capability at L1, vendor in the ADR." He **undervalues design/non-coding work** — keep reframing it as senior work. Also: why keyword flagging runs at upload not chat; `enumerate()` order; `+=` vs `append`; `# type: ignore`.
