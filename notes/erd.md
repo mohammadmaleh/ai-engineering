@@ -35,3 +35,15 @@ For designing relational schemas (ENG-12+). Database design was my weakest point
   - `documents(organization_id, status)` — the work-queue lookup.
   - `audit_log(organization_id, created_at)` — the auditor's time-range filter.
 - Rule: an index speeds reads on that column but costs a little on writes. Add them where the hot queries are.
+
+## Constraints belong in the database (not just app code)
+
+- An **ERD shows *shape*** (tables, columns, PK/FK, cardinality). It does **NOT** show `UNIQUE`, `CHECK`, enums, `NOT NULL`, defaults, or indexes — those are written as notes / live in the migration DDL.
+- Mermaid can mark a **single-column** unique (`email UK`) but **not a composite** one — `UNIQUE(user_id, organization_id)` has to be a written note.
+- **Put invariants in the DB as constraints.** A constraint can *never* be violated; app-level checks get forgotten, bypassed by another code path, or lost in a race. Make correctness *structural*.
+- Concrete ones for MedDocs:
+  - `UNIQUE(user_id, organization_id)` on `memberships` → one role per user per org (else separation of duties breaks + ambiguous role).
+  - `CHECK`/enum on `role`, `status`, `doc_type`, `urgency` → a typo can't become a silent bug.
+  - **`timestamptz`, never naive `timestamp`** — timezone-aware, stored UTC.
+  - `audit_log` / `document_events` = **append-only** (insert only) → trustworthy trail.
+- **Interview line:** *"I enforce business invariants with database constraints — e.g. a unique constraint on (user, org) guarantees one role per user per org no matter what the app code does."*
